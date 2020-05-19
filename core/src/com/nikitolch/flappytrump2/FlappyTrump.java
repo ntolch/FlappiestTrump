@@ -5,12 +5,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.nikitolch.flappytrump2.Screens.PlayScreen;
 
 public class FlappyTrump extends Game {
 	public static final int VIRTUAL_WIDTH = 700;
-	public static final int VIRTUAL_HEIGHT = 650;
+	public static final int VIRTUAL_HEIGHT = 670;
 	public SpriteBatch batch;
+
+	ShapeRenderer shape;
 
 	Prefs prefs;
 
@@ -18,6 +21,8 @@ public class FlappyTrump extends Game {
 	public void create () {
 		batch = new SpriteBatch();
 		setScreen(new PlayScreen(this)); // pass "this" to allow Game to setScreen
+
+		shape = new ShapeRenderer();
 	}
 
 	@Override

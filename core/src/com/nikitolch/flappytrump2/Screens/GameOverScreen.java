@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.nikitolch.flappytrump2.FlappyTrump;
 import com.nikitolch.flappytrump2.Prefs;
-import com.nikitolch.flappytrump2.Scenes.Hud;
 
 public class GameOverScreen implements Screen {
     private Viewport viewport;
@@ -25,7 +24,6 @@ public class GameOverScreen implements Screen {
     private FlappyTrump game;
 
     private Prefs prefs;
-    private Hud hud;
 
     private Label gameOverLabel;
     private Label scoreLabel;
@@ -35,7 +33,6 @@ public class GameOverScreen implements Screen {
     public GameOverScreen(final FlappyTrump game) {
         this.game = game;
         prefs = new Prefs();
-        hud = new Hud(game.batch);
         viewport = new FitViewport(FlappyTrump.VIRTUAL_WIDTH, FlappyTrump.VIRTUAL_HEIGHT, new OrthographicCamera());
         stage = new Stage(viewport, (game).batch);
 
@@ -48,24 +45,20 @@ public class GameOverScreen implements Screen {
         Label.LabelStyle font = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
 
         gameOverLabel = new Label("GAME OVER", font);
-        scoreLabel = new Label("Score: " + hud.getScore(), font);
+        scoreLabel = new Label("Score: " + prefs.getCurrentScore(), font);
         highScoreLabel = new Label("High Score: " + prefs.getHighScore(), font);
         playButton = new Label("Play Again", font);
 
         playButton.addListener(new InputListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Touch Up");
-                game.setScreen(new PlayScreen(game));
                 Gdx.input.setInputProcessor(null);
+                game.setScreen(new PlayScreen(game));
             }
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println("Touch Down");
-                playButton.setText("PRESSED");
                 return true;
             }
-
         });
 
         gameOverLabel.setFontScale(5f);

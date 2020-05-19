@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -14,18 +15,20 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.nikitolch.flappytrump2.FlappyTrump;
 import com.nikitolch.flappytrump2.Prefs;
 import com.nikitolch.flappytrump2.Scenes.Hud;
+import com.nikitolch.flappytrump2.Sprites.Obstacle;
 import com.nikitolch.flappytrump2.Sprites.Player;
 import com.nikitolch.flappytrump2.Sprites.Tube;
-import com.sun.org.apache.xpath.internal.res.XPATHErrorResources_ja;
 
-// TODO: Displaying score during game
-// next... display score and high score on game over screen
+import java.util.Random;
 
+// TODO: add obstacles: draw one for every 2-4 pipes(?), move up through pipes
+// Trump Obstacles: China, News, Dems, Science
+// Trump Bonuses: Kanye ("I love this guy"), Putin
 public class PlayScreen implements Screen {
     private static final int GROUND_Y_OFFSET = -65;
     private static final int GROUND_X_OFFSET = -100;
     private static final int NUM_OF_TUBES = 4;
-    private static final int TUBE_SPACING = 150;
+    private static final int TUBE_SPACING = 250;
     private static final int PLAYER_X_START = 50;
 
     private FlappyTrump game;
@@ -41,9 +44,12 @@ public class PlayScreen implements Screen {
 
     private Player player;
     private Array<Tube> tubes;
+    private Obstacle obstacle;
+
+    private int obstacleInterval = 3;
+    private Random rand;
 
     int scoringTube = 0;
-
 
     public PlayScreen(FlappyTrump game) {
         this.game = game;
@@ -64,19 +70,24 @@ public class PlayScreen implements Screen {
 
         player = new Player(PLAYER_X_START, 300);
 
-        // Create and place initial tubes
+        // Create and place initial tubes and obstacles
         tubes = new Array<Tube>();
         for (int i = 1; i <= NUM_OF_TUBES; i++) {
             tubes.add(new Tube(i * (TUBE_SPACING + Tube.TUBE_WIDTH)));
         }
+        obstacle = new Obstacle(tubes.get(tubes.size-1).getPosTopTube().x);
+        rand = new Random();
     }
 
     public void update(float dt) {
-        // Handle User Input first
-        handleInput(dt);
+        // Handle User Input first, long as game is not over
+        if (!gameOver()) {
+            handleInput(dt);
+            player.update(dt);
+            obstacle.update(dt);
+        }
 
         updateGround();
-        player.update(dt);
         updateScore();
         updateObstacles();
 
@@ -90,30 +101,44 @@ public class PlayScreen implements Screen {
     private void updateObstacles() {
         for (int i = 0; i < tubes.size; i++) {
             Tube tube = tubes.get(i);
-
             // Reposition tubes as they go out of view of moving camera
             if(gamecam.position.x - (gamecam.viewportWidth/2) > tube.getPosTopTube().x + tube.getTopTube().getWidth()) {
                 tube.reposition(tube.getPosTopTube().x + ((Tube.TUBE_WIDTH + TUBE_SPACING) * NUM_OF_TUBES));
             }
+            if (hud.getScore() > 1) {
+                if (i % obstacleInterval == 0) { // Reset obstacles at intervals (set by obstacleInterval)
+                    if (obstacle.getPosition().y > FlappyTrump.VIRTUAL_HEIGHT) { // Check if obstacle has reached top of screen
+//                        if (gamecam.position.x - (gamecam.viewportWidth/2) > obstacle.getPosition().x + obstacle.getTexture().getWidth()) {// Check if obstacle has passed out of screen
+                        obstacle.reset(tubes.get(i).getPosTopTube().x);
+//                        }
+                    }
+
+                    System.out.println("Obstacle Position: " + obstacle.getPosition().x);
+                    System.out.println("Tube Pos: " + tube.getPosBotTube().x);
+                }
+            }
+
+
+
+
+//            obstacleInterval = rand.nextInt(3) + 1;
+//            if (i % obstacleInterval == 0) {
+//                if(gamecam.position.x - (gamecam.viewportWidth/2) > obstacle.getPosition().x + obstacle.getTexture().getWidth()) {
+////                    obstacle = new Obstacle(tubes.get(i).getPosBotTube().x);
+//                    obstacle.reset(tubes.get(i).getPosTopTube().x);
+//                }
+//            }
         }
     }
 
     private void updateScore() {
         if (tubes.get(scoringTube).getPosTopTube().x < player.getPosition().x) {
         hud.addScore();
-
-            if (scoringTube < NUM_OF_TUBES - 1) {
-                scoringTube++;
-            } else {
-                scoringTube = 0;
-            }
+            // Keep track of tube that will increase score
+            if (scoringTube < NUM_OF_TUBES - 1) { scoringTube++; }
+            else { scoringTube = 0; }
         }
-        // Change score display if score > 0
     }
-
-//    private int getScore() {
-//        return hud.getScore();
-//    }
 
     private void updateGround() {
         if(gamecam.position.x - (gamecam.viewportWidth / 2) > groundPos1.x + ground.getWidth()) {
@@ -128,6 +153,7 @@ public class PlayScreen implements Screen {
         if(Gdx.input.justTouched()) { player.jump(); }
     }
 
+    // when obstacle reaches top of screen, change image and reposition to another tube
     @Override
     public void render(float delta) {
         gamecam.update();
@@ -142,12 +168,14 @@ public class PlayScreen implements Screen {
         game.batch.draw(ground, groundPos1.x, groundPos1.y);
         game.batch.draw(ground, groundPos2.x, groundPos2.y);
 
-        game.batch.draw(player.getCurrentTexture(), player.getPosition().x, player.getPosition().y);
+            game.batch.draw(obstacle.getTexture(), obstacle.getPosition().x, obstacle.getPosition().y);
+
 
         for (Tube tube : tubes) {
             game.batch.draw(tube.getTopTube(), tube.getPosTopTube().x, tube.getPosTopTube().y);
             game.batch.draw(tube.getBottomTube(), tube.getPosBotTube().x, tube.getPosBotTube().y);
         }
+        game.batch.draw(player.getCurrentTexture(), player.getPosition().x, player.getPosition().y);
 
         // Separate update logic from render
         update(delta);
@@ -158,15 +186,19 @@ public class PlayScreen implements Screen {
 //        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
 
+        // TEMPORARY: draw shape of player bounds
+//        obstacle.shapeBounds.setProjectionMatrix(gamecam.combined);
+//        obstacle.shapeBounds.begin(ShapeType.Line);
+//        obstacle.shapeBounds.setColor(1,0,0,1);
+//        obstacle.shapeBounds.circle(obstacle.getBounds().x, obstacle.getBounds().y, obstacle.getBounds().radius);
+//        obstacle.shapeBounds.end();
+
         if (gameOver()) {
             endGame();
         }
-
     }
 
     private void endGame() {
-        // freeze player, stop user input, let player fall off screen
-        //...
         saveScore();
         Timer.schedule(new Task() {
             @Override
@@ -174,20 +206,23 @@ public class PlayScreen implements Screen {
                 game.setScreen(new GameOverScreen(game));
                 dispose();
             }
-        }, 2f);
+        }, 7f);
     }
 
     private void saveScore() {
         if (hud.getScore() > prefs.getHighScore()) {
             prefs.updateHighScore(hud.getScore());
         }
+        prefs.updateCurrentScore(hud.getScore());
     }
 
     public boolean gameOver() {
         for (int i = 0; i < tubes.size; i++) {
             Tube tube = tubes.get(i);
             // Check if player touches tubes or obstacles or ground
-            if(tube.collides(player.getBounds()) || player.getPosition().y <= ground.getHeight() + GROUND_Y_OFFSET) {
+            if(tube.collides(player.getBounds()) ||
+//                    obstacle.collides(player.getBounds()) ||
+                    player.getPosition().y <= ground.getHeight() + GROUND_Y_OFFSET) {
                 return true;
             }
         }
@@ -204,6 +239,7 @@ public class PlayScreen implements Screen {
         background.dispose();
         ground.dispose();
         player.dispose();
+        obstacle.dispose();
         for (Tube tube : tubes) {
             tube.dispose();
         }

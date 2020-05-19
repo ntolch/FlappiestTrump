@@ -9,12 +9,13 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.Random;
 
 public class Tube {
-    public static final int TUBE_WIDTH = 90;
-    private static final int FLUCTUATION = 200;
-    private static final int TUBE_GAP = 100;
-    private static final int LOWEST_OPENING = 250;
+    public static final int TUBE_WIDTH = 80;
+    private static final int FLUCTUATION = 220;
+    private static final int TUBE_GAP = 250;
+    private static final int LOWEST_OPENING = 80;
+    private static final int OBSTACLE_HEIGHT = 80;
 
-    Texture topTube, bottomTube;
+    private Texture topTube, bottomTube;
     private Vector2 posTopTube, posBotTube;
     private Rectangle boundsTop, boundsBot;
     private Random rand;
@@ -24,7 +25,7 @@ public class Tube {
         bottomTube = new Texture("bottomtube.png");
         rand = new Random();
 
-        posTopTube = new Vector2(x, rand.nextInt() + TUBE_GAP + LOWEST_OPENING);
+        posTopTube = new Vector2(x, rand.nextInt() + TUBE_GAP + LOWEST_OPENING + OBSTACLE_HEIGHT);
         posBotTube = new Vector2(x, posTopTube.y - TUBE_GAP - bottomTube.getHeight());
 
         boundsTop = new Rectangle(posTopTube.x, posTopTube.y, topTube.getWidth(), topTube.getHeight());
@@ -32,15 +33,10 @@ public class Tube {
     }
 
     public void reposition(float x) {
-        posTopTube.set(x, rand.nextInt(FLUCTUATION) + TUBE_GAP + LOWEST_OPENING);
+        posTopTube.set(x, rand.nextInt(FLUCTUATION) + TUBE_GAP + LOWEST_OPENING + OBSTACLE_HEIGHT);
         posBotTube.set(x, posTopTube.y - TUBE_GAP - bottomTube.getHeight());
         boundsTop.setPosition(posTopTube.x, posTopTube.y);
         boundsBot.setPosition(posBotTube.x, posBotTube.y);
-    }
-
-    public boolean passed(Circle player) {
-//        Check if tube.x position is less than player.x position
-        return true;
     }
 
     public boolean collides(Circle player) {
