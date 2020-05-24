@@ -1,23 +1,18 @@
 package com.nikitolch.flappytrump2.Sprites;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.nikitolch.flappytrump2.Animation;
 import com.nikitolch.flappytrump2.FlappyTrump;
 
-import javax.xml.soap.Text;
-
 public class Player {
     private static final int GRAVITY = -15;
-    private static final int MOVEMENT = 100;
+    private int movement = 100;
+    private float timeState;
 
 //    public ShapeRenderer shapeBounds;
 //    public ShapeRenderer shapePos;
@@ -37,10 +32,12 @@ public class Player {
         playerAnimation = new Animation(new TextureRegion(texture), 9, 0.5f);
         bounds = new Circle(x + texture.getHeight()/2, y + texture.getHeight()/2, texture.getHeight()/2);
 
+        timeState = 0;
+
 //        shapeBounds = new ShapeRenderer();
 //        shapePos = new ShapeRenderer();
     }
-// if game is over, freeze player at current frame
+
     public void update(float dt) {
         playerAnimation.update(dt);
 
@@ -52,35 +49,34 @@ public class Player {
         }
 
         velocity.scl(dt);
-        position.add(MOVEMENT * dt, velocity.y);
+        position.add(movement * dt, velocity.y);
         velocity.scl(1/dt);
 
         bounds.setPosition(position.x + texture.getHeight()/2, position.y + texture.getHeight()/2);
+    }
 
-//        shapeBounds = new ShapeRenderer();
-//        shapeBounds.begin(ShapeType.Line);
-//        shapeBounds.setColor(1,0,0,1);
-//        shapeBounds.circle(bounds.x, bounds.y, bounds.radius);
-//        shapeBounds.end();
-//
-//        shapePos = new ShapeRenderer();
-//        shapePos.begin(ShapeType.Line);
-//        shapePos.setColor(0,1,0,1);
-//        shapePos.circle(position.x, position.y, texture.getHeight()/2);
-//        shapePos.end();
+    public void stationaryUpdate(float dt) {
+        playerAnimation.update(dt);
     }
 
     public void jump() {
         velocity.y = 250;
     }
-
-    public void die() {
-        velocity.y = 0;
-    }
+//
+//    public void die() {
+//        velocity.y = 0;
+//    }
 
     public void dispose() {
         texture.dispose();
-//        shapeBounds.dispose();
+    }
+
+    public void increaseMovement() {
+        timeState += Gdx.graphics.getDeltaTime();
+        if (timeState > 1f) {
+            timeState = 0f;
+            movement += 40;
+        }
     }
 
     // Getters
@@ -98,5 +94,9 @@ public class Player {
 
     public Circle getBounds() {
         return bounds;
+    }
+
+    public int getMovement() {
+        return movement;
     }
 }

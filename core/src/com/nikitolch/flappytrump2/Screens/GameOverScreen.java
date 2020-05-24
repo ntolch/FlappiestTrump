@@ -2,11 +2,15 @@ package com.nikitolch.flappytrump2.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -25,11 +29,19 @@ public class GameOverScreen implements Screen {
 
     private Prefs prefs;
 
+    private Sound music;
+
+    private Texture background, ground;
+    private Vector2 groundPos1;
+
+    private Table table;
     private Label gameOverLabel;
     private Label scoreLabel;
     private Label highScoreLabel;
-    private Label playButton;
-
+    private Label clickToPlay;
+    // TODO: draw background
+    // add Mike's game over music
+    //find skin and font
     public GameOverScreen(final FlappyTrump game) {
         this.game = game;
         prefs = new Prefs();
@@ -38,7 +50,14 @@ public class GameOverScreen implements Screen {
 
         Gdx.input.setInputProcessor(stage);
 
-        Table table = new Table();
+//        music = FlappyTrump.manager.get("sounds/GameOverMusic.wav", Sound.class);
+        music = Gdx.audio.newSound(Gdx.files.internal("sounds/GameOverMusic.wav"));
+        music.play();
+
+        background = new Texture("dark-background.jpg");
+        ground = new Texture("ground.png");
+
+        table = new Table();
         table.center();
         table.setFillParent(true);
 
@@ -47,50 +66,42 @@ public class GameOverScreen implements Screen {
         gameOverLabel = new Label("GAME OVER", font);
         scoreLabel = new Label("Score: " + prefs.getCurrentScore(), font);
         highScoreLabel = new Label("High Score: " + prefs.getHighScore(), font);
-        playButton = new Label("Play Again", font);
+        clickToPlay = new Label("Click To Try Again", font);
 
-        playButton.addListener(new InputListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                Gdx.input.setInputProcessor(null);
-                game.setScreen(new PlayScreen(game));
-            }
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
+        gameOverLabel.setFontScale(5.5f);
+        scoreLabel.setFontScale(4f);
+        highScoreLabel.setFontScale(4f);
+        clickToPlay.setFontScale(4.5f);
 
-        gameOverLabel.setFontScale(5f);
-        scoreLabel.setFontScale(3f);
-        highScoreLabel.setFontScale(3f);
-        playButton.setFontScale(4f);
-
-        table.add(gameOverLabel).expandX().padTop(90);
+        table.add(gameOverLabel).top().expandX().padTop(10).padBottom(150);
         table.row();
         table.add(highScoreLabel).expandX();
         table.row();
         table.add(scoreLabel).expandX();
         table.row();
-        table.add(playButton).expand();
+        table.add(clickToPlay).expandX().padTop(100).padBottom(200);
 
         stage.addActor(table);
-    }
-    @Override
-    public void show() {
-
     }
 
     @Override
     public void render(float delta) {
+        if (Gdx.input.justTouched()) {
+            game.setScreen(new MenuScreen(game));
+            dispose();
+        }
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        stage.act();
+
+        game.batch.begin();
+        game.batch.draw(background, FlappyTrump.VIRTUAL_WIDTH/ 2-background.getWidth()/2, ground.getHeight());
+        game.batch.draw(ground, FlappyTrump.VIRTUAL_WIDTH/ 2-ground.getWidth()/2, PlayScreen.GROUND_Y_OFFSET);
+        game.batch.end();
         stage.draw();
     }
 
-
-    public void showScore() {
+    @Override
+    public void show() {
 
     }
 
@@ -116,6 +127,7 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void dispose() {
+        music.dispose();
         stage.dispose();
     }
 }

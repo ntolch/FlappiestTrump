@@ -1,5 +1,6 @@
 package com.nikitolch.flappytrump2.Scenes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -21,51 +22,64 @@ public class Hud implements Disposable {
     public Stage stage;
     private Viewport viewport;
     private Integer score = 0;
-    private int tempNum = -4;
+    private int tempNum = -2;
 
+    private Table table;
     private Label scoreLabel;
-    private Label levelLabel;
-    private Label characterLabel;
+    private Label gameNameLabel;
+
+    private BitmapFont timerFont;
 
     public Hud(SpriteBatch sb) {
         viewport = new FitViewport(FlappyTrump.VIRTUAL_WIDTH, FlappyTrump.VIRTUAL_HEIGHT, new OrthographicCamera());
         stage = new Stage(viewport, sb);
 
-        Table table = new Table();
+        table = new Table();
         table.top().pad(10);
         table.setFillParent(true);
 
         Label.LabelStyle font = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
 
+//        Label flappyLable = new Label("label", new Label.LabelStyle(new BitmapFont(Gdx.files.internal("data/birdfont.fnt")), Color.MAGENTA));
+
+
+        gameNameLabel = new Label("", font);
+        gameNameLabel.setFontScale(4f);
         scoreLabel = new Label("0", font);
-        levelLabel = new Label("Level", font);
-        characterLabel = new Label("TRUMP", font);
-
         scoreLabel.setFontScale(4f);
-        levelLabel.setFontScale(4f);
 
-        table.add(levelLabel).expandX().left().top().fill();
+        table.add(gameNameLabel).expandX().top().center().padTop(15f);
         table.row();
         table.add(scoreLabel).expand().left().bottom();
-
         stage.addActor(table);
+
+        timerFont = new BitmapFont();
+    }
+
+    public void drawTime(SpriteBatch batch, int counter) {
+        timerFont.getData().setScale(6f);
+        timerFont.draw(batch, String.valueOf(counter), FlappyTrump.VIRTUAL_WIDTH/2-80, FlappyTrump.VIRTUAL_HEIGHT/2+85);
     }
 
     public void addScore() {
-        tempNum++;
-        if (tempNum > 0) {
+        if (tempNum <= 0) {
+            tempNum++;
+        } else if (tempNum > 0) {
             score++;
             scoreLabel.setText(score);
-            System.out.println("hud Score added: " + score);
         }
     }
 
-    public int getScore(){
-        return score;
+    public void displayGameName() {
+        gameNameLabel.setText("Flappy Trump");
     }
 
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    public int getScore(){
+        return score;
     }
 }
