@@ -7,7 +7,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -17,7 +16,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.nikitolch.flappytrump2.FlappyTrump;
 import com.nikitolch.flappytrump2.Prefs;
 import com.nikitolch.flappytrump2.Scenes.Hud;
-import com.nikitolch.flappytrump2.Sprites.Obstacle;
+import com.nikitolch.flappytrump2.Sprites.Obstacles.Obstacle;
 import com.nikitolch.flappytrump2.Sprites.Player;
 import com.nikitolch.flappytrump2.Sprites.Tube;
 
@@ -25,6 +24,7 @@ import java.util.Random;
 
 // TODO: default screen size
 // TODO: add quit and how to quit?
+// TODO: add coin/point sound when you get a point && if obstacle sound has not been played
 // Trump Obstacles: China, News, Dems, Science
 // Trump Bonuses: Kanye ("I love this guy"), Putin
 public class PlayScreen implements Screen {
@@ -74,7 +74,7 @@ public class PlayScreen implements Screen {
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/music.mp3"));
         music.setLooping(true);
         music.setVolume(.16f);
-        music.play();
+//        music.play();
 
 //        gameOverSound = FlappyTrump.manager.get("sounds/loser.mp3", Sound.class);
         gameOverSound = Gdx.audio.newSound(Gdx.files.internal("sounds/loser.mp3"));
@@ -130,15 +130,13 @@ public class PlayScreen implements Screen {
             }
 
             if (!gameOver()) {
-//                dt *= speedRatio;
                 handleInput(); // Handle User Input first
                 player.update(dt);
                 obstacle.update(dt);
                 if (hud.getScore() >= 9 && hud.getScore() < 10) {
                     player.increaseMovement();
                 }
-                if (hud.getScore() % 30 == 0 && hud.getScore() > 1) {
-//                    speedRatio += .01f;
+                if (hud.getScore() % 20 == 0 && hud.getScore() > 1) {
                     player.increaseMovement();
                 }
             }
@@ -210,7 +208,7 @@ public class PlayScreen implements Screen {
     public void render(float delta) {
 //        gamecam.update();
 
-        Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.batch.setProjectionMatrix(gamecam.combined);
@@ -242,8 +240,8 @@ public class PlayScreen implements Screen {
 //        obstacle.shapeBounds.end();
 
         // Set batch to now draw what Hud cam sees
-        game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
-        hud.stage.draw();
+        game.batch.setProjectionMatrix(hud.getStage().getCamera().combined);
+        hud.getStage().draw();
 
         if (gameOver()) {
             endGame();
@@ -256,10 +254,9 @@ public class PlayScreen implements Screen {
     }
     private void endGame() {
         music.stop();
-        obstacle.getSound().stop();
+        if (obstacle.getSound() != null) obstacle.getSound().stop();
         if (!gameOverSoundPlayed) {
             playGameOverSound();
-
         }
         saveScore();
         Timer.schedule(new Task() {

@@ -10,10 +10,10 @@ import java.util.Random;
 
 public class Tube {
     public static final int TUBE_WIDTH = 80;
-    private static final int FLUCTUATION = 300;
-    private static final int TUBE_GAP = 230;
+    private static final int FLUCTUATION = 330;
+    private static final int TUBE_GAP = 200;
     private static final int LOWEST_OPENING = 300;
-    private static final int OBSTACLE_HEIGHT = 90;
+    private static final int OBSTACLE_HEIGHT = 80;
 
     private Texture topTube, bottomTube;
     private Vector2 posTopTube, posBotTube;

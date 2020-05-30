@@ -9,10 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -29,10 +26,11 @@ public class GameOverScreen implements Screen {
 
     private Prefs prefs;
 
-    private Sound music;
+    private Music music;
+    private boolean musicPlayed;
+    private float timeState;
 
     private Texture background, ground;
-    private Vector2 groundPos1;
 
     private Table table;
     private Label gameOverLabel;
@@ -51,8 +49,9 @@ public class GameOverScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
 //        music = FlappyTrump.manager.get("sounds/GameOverMusic.wav", Sound.class);
-        music = Gdx.audio.newSound(Gdx.files.internal("sounds/GameOverMusic.wav"));
-        music.play();
+        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/GameOverMusic.wav"));
+        music.setVolume(.3f);
+        music.setLooping(false);
 
         background = new Texture("dark-background.jpg");
         ground = new Texture("ground.png");
@@ -82,6 +81,8 @@ public class GameOverScreen implements Screen {
         table.add(clickToPlay).expandX().padTop(100).padBottom(200);
 
         stage.addActor(table);
+
+        timeState = 0;
     }
 
     @Override
@@ -93,6 +94,13 @@ public class GameOverScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        timeState += Gdx.graphics.getDeltaTime();
+        if (timeState >= .01f && !musicPlayed) {
+            timeState = 0;
+            musicPlayed = true;
+            music.play();
+        }
+
         game.batch.begin();
         game.batch.draw(background, FlappyTrump.VIRTUAL_WIDTH/ 2-background.getWidth()/2, ground.getHeight());
         game.batch.draw(ground, FlappyTrump.VIRTUAL_WIDTH/ 2-ground.getWidth()/2, PlayScreen.GROUND_Y_OFFSET);
@@ -101,12 +109,12 @@ public class GameOverScreen implements Screen {
     }
 
     @Override
-    public void show() {
-
+    public void resize(int width, int height) {
+        viewport.update(width, height);
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void show() {
 
     }
 

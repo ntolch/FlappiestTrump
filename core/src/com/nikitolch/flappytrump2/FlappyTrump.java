@@ -16,27 +16,28 @@ public class FlappyTrump extends Game {
 	public static final int VIRTUAL_WIDTH = 700;
 	public static final int VIRTUAL_HEIGHT = 1300;
 	public SpriteBatch batch;
-	public static AssetManager manager;
+//	public static AssetManager manager;
 
 	Prefs prefs;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		manager = new AssetManager();
-		manager.load("sounds/music.mp3", Music.class);
-		manager.load("sounds/GameOverMusic.wav", Sound.class);
-		manager.load("sounds/china-yell.mp3", Sound.class);
-		manager.load("sounds/im-smarter-than-anybody.mp3", Sound.class);
-		manager.load("sounds/nasty-question.mp3", Sound.class);
-		manager.load("sounds/loser.mp3", Sound.class);
-
-		manager.load("ground.png", Texture.class);
-		manager.load("obstacles/china.png", Texture.class);
-		manager.load("obstacles/reporter.png", Texture.class);
-		manager.load("obstacles/scientist.png", Texture.class);
-
-		manager.finishLoading();
+//		manager = new AssetManager();
+//		manager.load("sounds/music.mp3", Music.class);
+//		manager.load("sounds/GameOverMusic.wav", Sound.class);
+//		manager.load("sounds/china-yell.mp3", Sound.class);
+//		manager.load("sounds/im-smarter-than-anybody.mp3", Sound.class);
+//		manager.load("sounds/nasty-question.mp3", Sound.class);
+//		manager.load("sounds/loser.mp3", Sound.class);
+//
+//		manager.load("ground.png", Texture.class);
+//		manager.load("obstacles/china.png", Texture.class);
+//		manager.load("obstacles/chinese-man.png", Texture.class);
+//		manager.load("obstacles/reporter.png", Texture.class);
+//		manager.load("obstacles/scientist.png", Texture.class);
+//
+//		manager.finishLoading();
 
 		setScreen(new MenuScreen(this)); // pass "this" to allow Game to setScreen
 	}
@@ -45,13 +46,13 @@ public class FlappyTrump extends Game {
 	public void render () {
 		super.render(); // delegates render method to whatever screen is active
 
-		float progress = manager.getProgress();
+//		float progress = manager.getProgress();
 	}
 
 	@Override
 	public void dispose () {
 		super.dispose();
 		batch.dispose();
-		manager.dispose();
+//		manager.dispose();
 	}
 }

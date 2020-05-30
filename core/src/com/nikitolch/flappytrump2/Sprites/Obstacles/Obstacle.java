@@ -1,4 +1,4 @@
-package com.nikitolch.flappytrump2.Sprites;
+package com.nikitolch.flappytrump2.Sprites.Obstacles;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -11,15 +11,10 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
-import com.nikitolch.flappytrump2.FlappyTrump;
 
 import java.util.Random;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
 
 public class Obstacle {
     private static int Y_OFFSET = -80;
@@ -65,15 +60,20 @@ public class Obstacle {
         path = ((FileTextureData)texture.getTextureData()).getFileHandle().name();
         switch (path) {
             case "china.png":
-                sound = FlappyTrump.manager.get("sounds/china-yell.mp3", Sound.class);
+                sound = Gdx.audio.newSound(Gdx.files.internal("sounds/china-yell.mp3"));
+//                sound = FlappyTrump.manager.get("sounds/china-yell.mp3", Sound.class);
+                volume = .5f;
+                break;
+            case "chinese-man.png":
+                sound = Gdx.audio.newSound(Gdx.files.internal("sounds/china-yell.mp3"));
                 volume = .5f;
                 break;
             case "reporter.png":
-                sound = FlappyTrump.manager.get("sounds/nasty-question.mp3", Sound.class);
+                sound = Gdx.audio.newSound(Gdx.files.internal("sounds/nasty-question.mp3"));
                 volume = .9f;
                 break;
             case "scientist.png":
-                sound = FlappyTrump.manager.get("sounds/im-smarter-than-anybody.mp3", Sound.class);
+                sound = Gdx.audio.newSound(Gdx.files.internal("sounds/im-smarter-than-anybody.mp3"));
                 volume = 1f;
                 break;
         }
@@ -88,16 +88,21 @@ public class Obstacle {
         path = ((FileTextureData)texture.getTextureData()).getFileHandle().name();
         switch (path) {
             case "china.png":
-                sound = FlappyTrump.manager.get("sounds/china-yell.mp3", Sound.class);
-                volume = .4f;
+                sound = Gdx.audio.newSound(Gdx.files.internal("sounds/china-yell.mp3"));
+//                sound = FlappyTrump.manager.get("sounds/china-yell.mp3", Sound.class);
+                volume = .5f;
+                break;
+            case "chinese-man.png":
+                sound = Gdx.audio.newSound(Gdx.files.internal("sounds/china-yell.mp3"));
+                volume = .5f;
                 break;
             case "reporter.png":
-                sound = FlappyTrump.manager.get("sounds/nasty-question.mp3", Sound.class);
-                volume = 1f;
+                sound = Gdx.audio.newSound(Gdx.files.internal("sounds/nasty-question.mp3"));
+                volume = .9f;
                 break;
             case "scientist.png":
-                sound = FlappyTrump.manager.get("sounds/im-smarter-than-anybody.mp3", Sound.class);
-                volume = .9f;
+                sound = Gdx.audio.newSound(Gdx.files.internal("sounds/im-smarter-than-anybody.mp3"));
+                volume = 1f;
                 break;
         }
 

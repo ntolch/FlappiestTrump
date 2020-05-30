@@ -19,7 +19,7 @@ import java.lang.Integer;
 
 // Heads Up Display
 public class Hud implements Disposable {
-    public Stage stage;
+    private Stage stage;
     private Viewport viewport;
     private Integer score = 0;
     private int tempNum = -2;
@@ -81,5 +81,9 @@ public class Hud implements Disposable {
 
     public int getScore(){
         return score;
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }

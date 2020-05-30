@@ -11,7 +11,7 @@ import com.nikitolch.flappytrump2.FlappyTrump;
 
 public class Player {
     private static final int GRAVITY = -15;
-    private int movement = 100;
+    private int movement = 130;
     private float timeState;
 
 //    public ShapeRenderer shapeBounds;
@@ -62,10 +62,6 @@ public class Player {
     public void jump() {
         velocity.y = 250;
     }
-//
-//    public void die() {
-//        velocity.y = 0;
-//    }
 
     public void dispose() {
         texture.dispose();
